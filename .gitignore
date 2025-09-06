@@ -1,0 +1,6 @@
+.crush
+CRUSH.md
+lazy-lock.json
+
+# Ignore bookmarks 
+vim-bookmarks 
