@@ -551,13 +551,17 @@ require('lazy').setup(
             source = 'if_many',
             spacing = 2,
             format = function(diagnostic)
-              local diagnostic_message = {
-                [vim.diagnostic.severity.ERROR] = diagnostic.message,
-                [vim.diagnostic.severity.WARN] = diagnostic.message,
-                [vim.diagnostic.severity.INFO] = diagnostic.message,
-                [vim.diagnostic.severity.HINT] = diagnostic.message,
-              }
-              return diagnostic_message[diagnostic.severity]
+              local source = diagnostic.source or ''
+              local code = diagnostic.code and ('[' .. diagnostic.code .. '] ') or ''
+              
+              -- Prioritize security issues from gosec
+              if source == 'gosec' then
+                return '[GOSEC] ' .. code .. diagnostic.message
+              elseif source:match('gopls') then
+                return '[LSP] ' .. code .. diagnostic.message
+              else
+                return code .. diagnostic.message
+              end
             end,
           },
         }
@@ -579,7 +583,15 @@ require('lazy').setup(
         --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
         local servers = {
           -- clangd = {},
-          -- gopls = {},
+          gopls = {
+            settings = {
+              gopls = {
+                gofumpt = true,
+                usePlaceholders = true,
+                completeUnimported = true,
+              },
+            },
+          },
           -- pyright = {},
           -- rust_analyzer = {},
           -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -622,6 +634,8 @@ require('lazy').setup(
         -- for you, so that they are available from within Neovim.
         local ensure_installed = vim.tbl_keys(servers or {})
         vim.list_extend(ensure_installed, {
+          'goimports',     -- Go formatter
+          'gofumpt',       -- Go formatter (stricter than gofmt)
           'stylua', -- Used to format Lua code
         })
         require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -915,7 +929,7 @@ require('lazy').setup(
       main = 'nvim-treesitter.configs', -- Sets main module to use for opts
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
       opts = {
-        ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+        ensure_installed = { 'bash', 'c', 'diff', 'go', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
         -- Autoinstall languages that are not installed
         auto_install = true,
         highlight = {
