@@ -77,6 +77,12 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Show errors in file
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- List functions with ,lf
+
+vim.keymap.set('n', '<leader>lf', function()
+  require('telescope.builtin').lsp_document_symbols { symbols = 'function' }
+end, { desc = 'LSP: List document functions' })
+
 -- Try multiple keybindings for Ctrl-/ since terminals handle it differently
 -- vim.keymap.set('n', '<C-/>', _G.toggle_floating_terminal, { desc = 'Toggle floating terminal' })
 
