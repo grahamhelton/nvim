@@ -83,6 +83,28 @@ vim.keymap.set('n', '<leader>lf', function()
   require('telescope.builtin').lsp_document_symbols { symbols = 'function' }
 end, { desc = 'LSP: List document functions' })
 
+-- list all symbols
+
+vim.keymap.set('n', '<leader>la', function()
+  require('telescope.builtin').lsp_document_symbols()
+end, { desc = 'LSP: List all symbols' })
+
+-- list all vars
+
+vim.keymap.set('n', '<leader>lv', function()
+  require('telescope.builtin').treesitter {
+    default_text = 'var',
+    -- sorting_strategy = 'ascending',
+    layout_config = {
+      preview_width = 0.6,
+    },
+    -- This ensures results are sorted by line number (top to bottom)
+    tiebreak = function(entry1, entry2)
+      return entry1.lnum < entry2.lnum
+    end,
+  }
+end, { desc = 'Variables (sorted by line)' })
+
 -- Try multiple keybindings for Ctrl-/ since terminals handle it differently
 -- vim.keymap.set('n', '<C-/>', _G.toggle_floating_terminal, { desc = 'Toggle floating terminal' })
 
